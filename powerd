@@ -1,0 +1,20 @@
+    #!/bin/sh
+    # arguments passed by powerd(8): device event
+    # debugging: exec 1>>/tmp/lid_switch.log 2>&1
+    if [ -z "$DISPLAY" ]; then export DISPLAY=:0; fi
+    case "${2}" in
+     pressed)    # lid closed
+       /usr/X11R6/bin/xset dpms force off
+       exit 0
+       ;;
+     released)   # lid opened
+       # need to both force dpms and reset screensaver
+       /usr/X11R6/bin/xset dpms force on
+       /usr/X11R6/bin/xset s reset
+       exit 0
+       ;;
+     *)
+       logger -p warning "${0}: unsupported event ${2} on device ${1}" >&1
+       exit 1
+       ;;
+    esac
